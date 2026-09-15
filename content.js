@@ -5,17 +5,40 @@ const slangMap = {
   "ngl": "not gonna lie",
   "fr": "for real",
   "ya": "yeah",
-  "nga": "nigga"
+  "nga": "nigga",
+  "plz": "please",
+  "dat": "that",
+  "u": "you",
+  "luv": "love",
+  "<3": "❤️ ",
+  "itz": "it's",
+  "ye": "yeah",
+  "pfp": "profile picture",
+  "bcuz": "because",
+  "gc": "groupchat",
+  "ai": "artificial intelligence",
+  
 };
 
 const pattern = new RegExp(`\\b(${Object.keys(slangMap).join("|")})\\b`, "gi");
+
+function matchCase(replacement, original) {
+  if (original === original.toUpperCase()) {
+    return replacement.toUpperCase();
+  }
+  if (original[0] === original[0].toUpperCase()) {
+    return replacement[0].toUpperCase() + replacement.slice(1);
+  }
+  return replacement;
+}
 
 function replaceText(node) {
   if (node.nodeType === Node.TEXT_NODE) {
     const original = node.nodeValue;
     const replaced = original.replace(pattern, (match) => {
       const lower = match.toLowerCase();
-      return slangMap[lower] !== undefined ? slangMap[lower] : match;
+      const replacement = slangMap[lower];
+      return replacement !== undefined ? matchCase(replacement, match) : match;
     });
     if (replaced !== original) {
       node.nodeValue = replaced;
