@@ -3,7 +3,7 @@
   "name": "slang translator",
   "version": "1.0",
   "description": "Replaces slang abbreviations to their full phrase as you browse.",
-  "permissions": [storage],
+  "permissions": ["storage"],
   "action": {
     "default_popup": "popup.html"
   },
