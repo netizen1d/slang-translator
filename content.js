@@ -1,5 +1,5 @@
 
-const slangMap = {
+const defaultSlangMap = {
   "ts": "this shit",
   "pmo": "piss me off",
   "ngl": "not gonna lie",
@@ -16,10 +16,9 @@ const slangMap = {
   "pfp": "profile picture",
   "bcuz": "because",
   "gc": "groupchat",
-  "ai": "artificial intelligence",
+  "ai": "artificial intelligence"
   
 };
-
 let slangMap = {};
 let pattern = null;
 
@@ -67,14 +66,31 @@ function runReplacement() {
   replaceText(document.body);
 }
 
-chrome.storage.sync.get(["slangMap"], (result) => {
-  slangMap = result.slangMap || defaultSlangMap;
-  runReplacement();
+let mutationObserver = null;
 
-  const observer = new MutationObserver((mutations) => {
+function startObserving() {
+  if (mutationObserver) {
+    mutationObserver.disconnect();
+  }
+  mutationObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => replaceText(node));
     });
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  mutationObserver.observe(document.body, { childList: true, subtree: true });
+}
+
+
+chrome.storage.sync.get(["slangMap"], (result) => {
+  slangMap = result.slangMap || defaultSlangMap;
+  runReplacement();
+  startObserving();
+});
+
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === "sync" && changes.slangMap) {
+    slangMap = changes.slangMap.newValue || defaultSlangMap;
+    runReplacement(); 
+  }
 });
