@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
   "name": "slang translator",
-  "version": "1.0",
+  "version": "1.01",
   "description": "Replaces slang abbreviations to their full phrase as you browse.",
   "permissions": ["storage"],
   "action": {
-    "default_popup": "popup.html"
-  },
+  "default_popup": "popup.html"
+  }
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
