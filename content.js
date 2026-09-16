@@ -20,7 +20,17 @@ const slangMap = {
   
 };
 
-const pattern = new RegExp(`\\b(${Object.keys(slangMap).join("|")})\\b`, "gi");
+let slangMap = {};
+let pattern = null;
+
+function buildPattern() {
+  const keys = Object.keys(slangMap);
+  if (keys.length === 0) {
+    pattern = null;
+    return;
+  }
+  pattern = new RegExp(`\\b(${keys.join("|")})\\b`, "gi");
+}
 
 function matchCase(replacement, original) {
   if (original === original.toUpperCase()) {
@@ -33,6 +43,7 @@ function matchCase(replacement, original) {
 }
 
 function replaceText(node) {
+  if (!pattern) return;
   if (node.nodeType === Node.TEXT_NODE) {
     const original = node.nodeValue;
     const replaced = original.replace(pattern, (match) => {
@@ -51,12 +62,19 @@ function replaceText(node) {
   }
 }
 
-replaceText(document.body);
+function runReplacement() {
+  buildPattern();
+  replaceText(document.body);
+}
 
-const observer = new MutationObserver((mutations) => {
-  mutations.forEach((mutation) => {
-    mutation.addedNodes.forEach((node) => replaceText(node));
+chrome.storage.sync.get(["slangMap"], (result) => {
+  slangMap = result.slangMap || defaultSlangMap;
+  runReplacement();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => replaceText(node));
+    });
   });
+  observer.observe(document.body, { childList: true, subtree: true });
 });
-
-observer.observe(document.body, { childList: true, subtree: true });
